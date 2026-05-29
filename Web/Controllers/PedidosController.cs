@@ -30,28 +30,25 @@ namespace Web.Controllers
             {
                 try
                 {
-                    // 1. Guardar el Maestro (Pedido)
                     Pedidos nuevoPedido = new Pedidos
                     {
                         id_cliente = model.IdCliente,
                         total = model.Total
                     };
                     db.Pedidos.Add(nuevoPedido);
-                    db.SaveChanges(); // Genera el ID del pedido
+                    db.SaveChanges();
 
-                    // 2. Guardar los Detalles
                     foreach (var item in model.Detalles)
                     {
                         Pedidos_detalle detalle = new Pedidos_detalle
                         {
-                            id_pedido = nuevoPedido.ID, // ID recién generado
+                            id_pedido = nuevoPedido.ID,
                             id_producto = item.IdProducto,
                             cant = item.Cantidad,
                             precio = item.Precio
                         };
                         db.Pedidos_detalle.Add(detalle);
 
-                        // Opcional: Restar del Stock en la tabla Productos
                         var producto = db.Productos.Find(item.IdProducto);
                         if (producto != null)
                         {
@@ -60,13 +57,13 @@ namespace Web.Controllers
                     }
 
                     db.SaveChanges();
-                    dbContextTransaction.Commit(); // Confirmamos los cambios en la BD
+                    dbContextTransaction.Commit();
 
                     return Json(new { success = true });
                 }
                 catch (Exception ex)
                 {
-                    dbContextTransaction.Rollback(); // Si algo falla, deshace todo
+                    dbContextTransaction.Rollback();
                     return Json(new { success = false, message = "Error: " + ex.Message });
                 }
             }
@@ -101,21 +98,18 @@ namespace Web.Controllers
                     var pedidoExistente = db.Pedidos.Find(idPedido);
                     if (pedidoExistente == null) return Json(new { success = false, message = "Pedido no encontrado" });
 
-                    // 1. Devolver el stock actual de los detalles viejos antes de borrarlos
                     var detallesViejos = db.Pedidos_detalle.Where(d => d.id_pedido == idPedido).ToList();
                     foreach (var detViejo in detallesViejos)
                     {
                         var prod = db.Productos.Find(detViejo.id_producto);
-                        if (prod != null) prod.Stock += detViejo.cant; // Devolvemos stock
+                        if (prod != null) prod.Stock += detViejo.cant;
 
-                        db.Pedidos_detalle.Remove(detViejo); // Eliminamos el detalle viejo
+                        db.Pedidos_detalle.Remove(detViejo);
                     }
 
-                    // 2. Actualizar datos maestros
                     pedidoExistente.id_cliente = model.IdCliente;
                     pedidoExistente.total = model.Total;
 
-                    // 3. Insertar los nuevos detalles y restar stock actualizado
                     foreach (var item in model.Detalles)
                     {
                         Pedidos_detalle nuevoDetalle = new Pedidos_detalle
