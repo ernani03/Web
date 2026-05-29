@@ -3,29 +3,51 @@
 }
 
 <div class="jumbotron">
-    <h1>ASP.NET</h1>
-    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
-    <p><a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
+    <h1>Sistema de Gestión de productos y pedidos</h1>
+    <p class="lead">Seleccione una de las siguientes secciones.</p>
 </div>
 
 <div class="row">
     <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>
-            ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
-            enables a clean separation of concerns and gives you full control over markup
-            for enjoyable, agile development.
-        </p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
+        <div class="panel panel-default text-center" style="box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-radius: 6px;">
+            <div class="panel-body" style="padding: 30px 15px;">
+                <div style="font-size: 45px; color: #3498db; margin-bottom: 15px;">
+                </div>
+                <h3>Clientes</h3>
+                <hr />
+                @Html.ActionLink("Ir a Clientes", "Index", "Clientes", null, new { @class = "btn btn-primary btn-block btn-lg" })
+            </div>
+        </div>
     </div>
+
     <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
+        <div class="panel panel-default text-center" style="box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-radius: 6px;">
+            <div class="panel-body" style="padding: 30px 15px;">
+                <div style="font-size: 45px; color: #2ecc71; margin-bottom: 15px;">
+                </div>
+                <h3>Productos</h3>                
+                <hr />
+                @Html.ActionLink("Ir a Productos", "Index", "Productos", null, new { @class = "btn btn-success btn-block btn-lg" })
+            </div>
+        </div>
     </div>
+
     <div class="col-md-4">
-        <h2>Web Hosting</h2>
-        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
+        <div class="panel panel-default text-center" style="box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-radius: 6px;">
+            <div class="panel-body" style="padding: 30px 15px;">
+                <div style="font-size: 45px; color: #e67e22; margin-bottom: 15px;">
+                </div>
+                <h3>Pedidos</h3>
+                <hr />
+                <div class="row">
+                    <div class="col-xs-6">
+                        @Html.ActionLink("Ver Lista", "Index", "Pedidos", null, new { @class = "btn btn-warning btn-block" })
+                    </div>
+                    <div class="col-xs-6">
+                        @Html.ActionLink("Nuevo Pedido", "Create", "Pedidos", null, new { @class = "btn btn-danger btn-block" })
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
