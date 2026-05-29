@@ -1,0 +1,30 @@
+﻿@model Web.Models.Pedidos
+
+@{
+    ViewBag.Title = "Eliminar Pedido";
+}
+
+<h2 class="text-danger">¿Está seguro de que desea eliminar este pedido?</h2>
+<h3>Esta acción devolverá los artículos cargados al inventario (Stock).</h3>
+
+<div>
+    <h4>Pedido Nro. @Model.ID</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>Cliente</dt>
+        <dd>@Model.Clientes.Nombre @Model.Clientes.Apellido</dd>
+
+        <dt>Total original</dt>
+        <dd>$@Model.total</dd>
+    </dl>
+
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="form-actions no-color">
+            <input type="submit" value="Confirmar Eliminación" class="btn btn-danger" /> |
+            @Html.ActionLink("Volver al Listado", "Index", null, new { @class = "btn btn-default" })
+        </div>
+    }
+</div>

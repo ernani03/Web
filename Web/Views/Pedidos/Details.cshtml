@@ -1,0 +1,49 @@
+﻿@model Web.Models.Pedidos
+
+@{
+    ViewBag.Title = "Detalles del Pedido";
+}
+
+<h2>Detalles del Pedido Nro. @Model.ID</h2>
+
+<div>
+    <h4>Información General</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>Cliente</dt>
+        <dd>@Model.Clientes.Nombre @Model.Clientes.Apellido (@Model.Clientes.Documento)</dd>
+
+        <dt>Total del Pedido</dt>
+        <dd class="text-success"><strong>$@Model.total</strong></dd>
+    </dl>
+</div>
+
+<h4>Artículos del Pedido</h4>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Código</th>
+            <th>Producto</th>
+            <th>Precio Unitario</th>
+            <th>Cantidad</th>
+            <th>Subtotal</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var detalle in Model.Pedidos_detalle)
+        {
+            <tr>
+                <td>@detalle.Productos.Codigo</td>
+                <td>@detalle.Productos.Descripcion</td>
+                <td>$@detalle.precio</td>
+                <td>@detalle.cant</td>
+                <td>$@(detalle.cant * detalle.precio)</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<p>
+    @Html.ActionLink("Editar", "Edit", new { id = Model.ID }, new { @class = "btn btn-warning" }) |
+    @Html.ActionLink("Volver a la Lista", "Index", null, new { @class = "btn btn-default" })
+</p>

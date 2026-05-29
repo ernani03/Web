@@ -13,9 +13,9 @@ namespace Web.Models
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
     
-    public partial class ConnectionString : DbContext
+    public partial class ModelDb : DbContext
     {
-        public ConnectionString()
+        public ModelDb()
             : base("name=ConnectionString")
         {
         }

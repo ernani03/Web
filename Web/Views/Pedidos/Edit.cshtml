@@ -1,0 +1,178 @@
+﻿@model Web.Models.Pedidos
+
+@{
+    ViewBag.Title = "Editar Pedido";
+}
+
+<h2>Modificar Pedido Nro. @Model.ID</h2>
+
+<div class="row">
+    <div class="col-md-4">
+        <h4>Datos del Pedido</h4>
+        <hr />
+        <div class="form-group">
+            <label>Cliente</label>
+            @Html.DropDownList("id_cliente", null, htmlAttributes: new { @class = "form-control", @id = "txtCliente" })
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <h4>Modificar Artículos</h4>
+        <hr />
+        <div class="row">
+            <div class="col-md-5">
+                <label>Producto</label>
+                @Html.DropDownList("id_producto", null, "-- Seleccione Producto --", htmlAttributes: new { @class = "form-control", @id = "txtProducto" })
+            </div>
+            <div class="col-md-3">
+                <label>Cantidad</label>
+                <input type="number" id="txtCantidad" class="form-control" value="1" min="1" />
+            </div>
+            <div class="col-md-2">
+                <label>Precio</label>
+                <input type="number" id="txtPrecio" class="form-control" readonly />
+            </div>
+            <div class="col-md-2">
+                <label>&nbsp;</label>
+                <button type="button" id="btnAgregar" class="btn btn-success btn-block">Añadir</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr />
+
+<table class="table table-bordered" id="tablaDetalles">
+    <thead>
+        <tr>
+            <th>Producto</th>
+            <th>Precio</th>
+            <th>Cantidad</th>
+            <th>Subtotal</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var d in Model.Pedidos_detalle)
+        {
+            <tr data-id="@d.id_producto" data-precio="@d.precio" data-cant="@d.cant">
+                <td>@d.Productos.Descripcion</td>
+                <td>$@d.precio</td>
+                <td>@d.cant</td>
+                <td>$@(d.cant * d.precio)</td>
+                <td><button type="button" class="btn btn-danger btn-sm btn-eliminar">X</button></td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div class="text-right">
+    <h3>Total: $<span id="lblTotal">@Model.total</span></h3>
+    <button type="button" id="btnGuardarCambios" class="btn btn-primary btn-lg">Guardar Cambios</button>
+</div>
+
+<p>
+    @Html.ActionLink("Volver a la Lista", "Index", null, new { @class = "btn btn-default" })
+</p>
+
+@section Scripts {
+    <script>
+        let detalles = [];
+
+        // Al cargar la página, leemos lo que el servidor renderizó en la tabla y llenamos el array JS
+        $("#tablaDetalles tbody tr").each(function () {
+            let idProd = $(this).data("id");
+            let precio = parseFloat($(this).data("precio"));
+            let cant = parseInt($(this).data("cant"));
+            detalles.push({ IdProducto: idProd, Cantidad: cant, Precio: precio });
+        });
+
+        // Evento temporal simulado para el precio del producto
+        $("#txtProducto").change(function () {
+            let idProd = $(this).val();
+
+            if (idProd) {
+                // Hacemos la consulta al servidor de forma asíncrona
+                $.ajax({
+                    url: '@Url.Action("ObtenerPrecioProducto", "Pedidos")',
+                    type: 'GET',
+                    data: { idProducto: idProd },
+                    success: function (data) {
+                        // Asignamos el precio real de la BD al input
+                        $("#txtPrecio").val(data.precio);
+                    },
+                    error: function () {
+                        alert("Error al obtener el precio del producto.");
+                    }
+                });
+            } else {
+                $("#txtPrecio").val(''); // Limpia el input si deseleccionan el producto
+            }
+        });
+
+        // Añadir items dinámicamente
+        $("#btnAgregar").click(function () {
+            let idProd = $("#txtProducto").val();
+            let nomProd = $("#txtProducto option:selected").text();
+            let cant = parseInt($("#txtCantidad").val());
+            let precio = parseFloat($("#txtPrecio").val());
+
+            if (!idProd || cant <= 0) return alert("Seleccione datos válidos");
+
+            let subtotal = cant * precio;
+            detalles.push({ IdProducto: idProd, Cantidad: cant, Precio: precio });
+
+            let fila = `<tr data-id="${idProd}" data-precio="${precio}" data-cant="${cant}">
+                <td>${nomProd}</td>
+                <td>$${precio}</td>
+                <td>${cant}</td>
+                <td>$${subtotal}</td>
+                <td><button type='button' class='btn btn-danger btn-sm btn-eliminar'>X</button></td>
+            </tr>`;
+
+            $("#tablaDetalles tbody").append(fila);
+            calcularTotal();
+        });
+
+        // Eliminar items de la tabla
+        $(document).on("click", ".btn-eliminar", function () {
+            let fila = $(this).closest("tr");
+            let idProd = fila.data("id");
+
+            // Remover del array JS
+            detalles = detalles.filter(item => item.IdProducto != idProd);
+            fila.remove();
+            calcularTotal();
+        });
+
+        function calcularTotal() {
+            let total = detalles.reduce((sum, item) => sum + (item.Cantidad * item.Precio), 0);
+            $("#lblTotal").text(total.toFixed(2));
+        }
+
+        // Envío AJAX de la edición
+        $("#btnGuardarCambios").click(function () {
+            let data = {
+                IdCliente: $("#txtCliente").val(),
+                Total: parseFloat($("#lblTotal").text()),
+                Detalles: detalles
+            };
+
+            if (detalles.length === 0) return alert("El pedido no puede quedar vacío.");
+
+            $.ajax({
+                url: '@Url.Action("EditarPedido", "Pedidos", new { idPedido = Model.ID })',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function (response) {
+                    if(response.success) {
+                        window.location.href = '@Url.Action("Index", "Pedidos")';
+                    } else {
+                        alert(response.message);
+                    }
+                }
+            });
+        });
+    </script>
+}
