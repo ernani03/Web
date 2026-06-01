@@ -73,18 +73,15 @@
     <script>
         let detalles = [];
 
-        // Cambiar precio automáticamente al seleccionar producto
         $("#txtProducto").change(function () {
             let idProd = $(this).val();
 
             if (idProd) {
-                // Hacemos la consulta al servidor de forma asíncrona
                 $.ajax({
                     url: '@Url.Action("ObtenerPrecioProducto", "Pedidos")',
                     type: 'GET',
                     data: { idProducto: idProd },
                     success: function (data) {
-                        // Asignamos el precio real de la BD al input
                         $("#txtPrecio").val(data.precio);
                     },
                     error: function () {
@@ -92,7 +89,7 @@
                     }
                 });
             } else {
-                $("#txtPrecio").val(''); // Limpia el input si deseleccionan el producto
+                $("#txtPrecio").val('');
             }
         });
 
@@ -124,7 +121,6 @@
             $("#lblTotal").text(total.toFixed(2));
         }
 
-        // Enviar todo por AJAX al controlador
         $("#btnGuardarPedido").click(function () {
             let data = {
                 IdCliente: $("#txtCliente").val(),

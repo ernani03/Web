@@ -79,7 +79,6 @@
     <script>
         let detalles = [];
 
-        // Al cargar la página, leemos lo que el servidor renderizó en la tabla y llenamos el array JS
         $("#tablaDetalles tbody tr").each(function () {
             let idProd = $(this).data("id");
             let precio = parseFloat($(this).data("precio"));
@@ -87,18 +86,15 @@
             detalles.push({ IdProducto: idProd, Cantidad: cant, Precio: precio });
         });
 
-        // Evento temporal simulado para el precio del producto
         $("#txtProducto").change(function () {
             let idProd = $(this).val();
 
             if (idProd) {
-                // Hacemos la consulta al servidor de forma asíncrona
                 $.ajax({
                     url: '@Url.Action("ObtenerPrecioProducto", "Pedidos")',
                     type: 'GET',
                     data: { idProducto: idProd },
                     success: function (data) {
-                        // Asignamos el precio real de la BD al input
                         $("#txtPrecio").val(data.precio);
                     },
                     error: function () {
@@ -106,11 +102,10 @@
                     }
                 });
             } else {
-                $("#txtPrecio").val(''); // Limpia el input si deseleccionan el producto
+                $("#txtPrecio").val('');
             }
         });
 
-        // Añadir items dinámicamente
         $("#btnAgregar").click(function () {
             let idProd = $("#txtProducto").val();
             let nomProd = $("#txtProducto option:selected").text();
@@ -134,12 +129,10 @@
             calcularTotal();
         });
 
-        // Eliminar items de la tabla
         $(document).on("click", ".btn-eliminar", function () {
             let fila = $(this).closest("tr");
             let idProd = fila.data("id");
 
-            // Remover del array JS
             detalles = detalles.filter(item => item.IdProducto != idProd);
             fila.remove();
             calcularTotal();
@@ -150,7 +143,6 @@
             $("#lblTotal").text(total.toFixed(2));
         }
 
-        // Envío AJAX de la edición
         $("#btnGuardarCambios").click(function () {
             let data = {
                 IdCliente: $("#txtCliente").val(),
